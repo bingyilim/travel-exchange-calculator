@@ -38,6 +38,16 @@ export type Purchase = {
   updated_at: string;
 };
 
+export type Expense = {
+  id: string;
+  trip_id: string;
+  user_id: string;
+  amount_foreign: number;
+  category: string;
+  notes: string | null;
+  created_at: string;
+};
+
 // -- Create DTOs (caller provides these; storage fills system fields) --------
 
 export type CreateTripInput = {
@@ -54,6 +64,19 @@ export type CreatePurchaseInput = {
   fee_amount?: number;
   purchased_at?: string;
   notes?: string;
+};
+
+export type CreateExpenseInput = {
+  trip_id: string;
+  amount_foreign: number;
+  category: string;
+  notes?: string;
+};
+
+export type UpdateExpenseInput = {
+  amount_foreign?: number;
+  category?: string;
+  notes?: string | null;
 };
 
 // -- Update DTOs (all fields optional) ---------------------------------------
