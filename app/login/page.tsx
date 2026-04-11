@@ -54,12 +54,27 @@ export default function LoginPage() {
 
       router.push("/dashboard");
     } else {
-      const { error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) {
         setError(error.message);
         setLoading(false);
         return;
       }
+
+      // If email confirmation is disabled, the user gets a session immediately.
+      if (data.session) {
+        if (hasLocalData() && data.user) {
+          try {
+            await migrateLocalDataToSupabase(supabase, data.user.id);
+          } catch {
+            // StorageProvider will retry on dashboard load.
+          }
+        }
+        router.push("/dashboard");
+        return;
+      }
+
+      // Email confirmation is enabled. User must verify first.
       setMessage("Check your email to confirm your account.");
       setLoading(false);
     }
