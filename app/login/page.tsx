@@ -232,46 +232,50 @@ export default function LoginPage() {
 
       {/* ── Right: Brand panel (desktop only) ───────────────────────── */}
       <div className="relative hidden flex-1 overflow-hidden lg:block">
-        <div className="absolute inset-0 bg-[#eef2ff] dark:bg-[#0f172a]" />
-        <div className="absolute -right-20 -top-20 h-[400px] w-[400px] rounded-full bg-blue-400/10 blur-[100px] dark:bg-blue-500/8" />
-        <div className="absolute -bottom-20 -left-20 h-[300px] w-[300px] rounded-full bg-violet-400/10 blur-[100px] dark:bg-violet-500/6" />
+        {/* Light: radial spotlight. Dark: flat navy */}
+        <div
+          className="absolute inset-0 dark:hidden"
+          style={{
+            background:
+              "radial-gradient(ellipse at 50% 40%, #1e3a5f 0%, #0f172a 70%)",
+          }}
+        />
+        <div className="absolute inset-0 hidden bg-[#0f172a] dark:block" />
 
         <div className="relative flex h-full flex-col items-center justify-center px-12">
           <ThemeToggle />
 
           {/* Decorative rate card */}
-          <div className="mt-8 w-full max-w-xs rounded-2xl border border-foreground/5 bg-white/60 p-6 shadow-lg shadow-black/[0.03] backdrop-blur-sm dark:border-white/10 dark:bg-white/5 dark:shadow-none">
-            <p className="text-xs font-medium text-muted dark:text-white/50">
+          <div className="mt-8 w-full max-w-xs rounded-2xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/30 backdrop-blur-sm">
+            <p className="text-xs font-medium tracking-wide text-white/50">
               Your Blended Rate
             </p>
-            <p className="mt-2 text-4xl font-bold tabular-nums text-foreground dark:text-white">
+            <p className="mt-2 text-5xl font-bold tabular-nums tracking-tight text-white">
               143.33
             </p>
-            <p className="mt-1 text-sm text-muted dark:text-white/40">
-              JPY per USD
-            </p>
-            <div className="mt-5 h-px bg-border dark:bg-white/10" />
+            <p className="mt-1 text-sm text-white/40">JPY per USD</p>
+            <div className="mt-5 h-px bg-white/10" />
             <div className="mt-4 flex justify-between text-xs">
               <div>
-                <p className="text-muted dark:text-white/40">Spent</p>
-                <p className="mt-0.5 font-semibold tabular-nums text-foreground/80 dark:text-white/80">
+                <p className="text-white/40">Spent</p>
+                <p className="mt-0.5 font-semibold tabular-nums text-white/80">
                   $300.00
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-muted dark:text-white/40">Received</p>
-                <p className="mt-0.5 font-semibold tabular-nums text-foreground/80 dark:text-white/80">
+                <p className="text-white/40">Received</p>
+                <p className="mt-0.5 font-semibold tabular-nums text-white/80">
                   &#165;43,000
                 </p>
               </div>
             </div>
           </div>
 
-          <p className="mt-10 max-w-xs text-center font-serif text-lg italic leading-relaxed text-foreground/50 dark:text-white/70">
+          <p className="mt-10 max-w-xs text-center font-serif text-lg italic leading-relaxed text-white/60">
             &ldquo;The real exchange rate is the one that includes your
             fees.&rdquo;
           </p>
-          <p className="mt-3 text-xs text-muted/50 dark:text-white/30">
+          <p className="mt-3 text-xs text-white/25">
             Travel Exchange Calculator
           </p>
         </div>

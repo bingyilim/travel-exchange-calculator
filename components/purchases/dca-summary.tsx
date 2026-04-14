@@ -85,7 +85,7 @@ export function DcaSummary({
         {hasFees ? (
           <p className="mt-0.5 text-xs text-muted">
             {homeCurrency}{" "}
-            <span className="text-rose-600 dark:text-amber-400">
+            <span className="text-[#e11d48] dark:text-[#fbbf24]">
               incl. {formatAmount(stats.totalFees, homeCurrency)} fees
             </span>
           </p>

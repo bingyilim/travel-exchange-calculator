@@ -70,7 +70,7 @@ export function PurchaseList({
             <span className="text-right text-sm tabular-nums text-foreground">
               {formatAmount(p.home_amount, homeCurrency)}
               {p.fee_amount > 0 && (
-                <span className="text-rose-600 dark:text-amber-400">
+                <span className="text-[#e11d48] dark:text-[#fbbf24]">
                   {" "}+{formatAmount(p.fee_amount, homeCurrency)}
                 </span>
               )}{" "}

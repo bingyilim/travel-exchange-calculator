@@ -9,11 +9,11 @@ import type { Expense } from "@/lib/types";
 // -- Category styling --------------------------------------------------------
 
 const CATEGORY_STYLES: Record<string, string> = {
-  Food: "bg-orange-100 text-orange-800 dark:bg-orange-500/10 dark:text-orange-400",
-  Transport: "bg-blue-100 text-blue-800 dark:bg-blue-500/10 dark:text-blue-400",
-  Shopping: "bg-pink-100 text-pink-800 dark:bg-pink-500/10 dark:text-pink-400",
-  Accommodation: "bg-violet-100 text-violet-800 dark:bg-violet-500/10 dark:text-violet-400",
-  Other: "bg-slate-100 text-slate-700 dark:bg-indigo-500/10 dark:text-indigo-400",
+  Food: "bg-[#fff7ed] text-[#9a3412] dark:bg-[#f59e0b]/10 dark:text-[#fbbf24]",
+  Transport: "bg-[#eff6ff] text-[#1e40af] dark:bg-[#3b82f6]/10 dark:text-[#60a5fa]",
+  Shopping: "bg-[#fdf2f8] text-[#9d174d] dark:bg-[#ec4899]/10 dark:text-[#f472b6]",
+  Accommodation: "bg-[#f5f3ff] text-[#5b21b6] dark:bg-[#8b5cf6]/10 dark:text-[#a78bfa]",
+  Other: "bg-[#f1f5f9] text-[#334155] dark:bg-[#6366f1]/10 dark:text-[#818cf8]",
 };
 
 function categoryClass(cat: string): string {
