@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useStorage } from "@/components/providers/storage-provider";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { DcaSummary } from "@/components/purchases/dca-summary";
 import { ExpenseCalculator } from "@/components/trips/expense-calculator";
 import { PurchaseList } from "@/components/purchases/purchase-list";
@@ -31,8 +32,6 @@ export default function TripDetailPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>("activity");
 
-  // -- Data fetching ---------------------------------------------------------
-
   useEffect(() => {
     Promise.all([storage.getTrip(id), storage.getPurchasesForTrip(id)]).then(
       ([t, p]) => {
@@ -51,16 +50,12 @@ export default function TripDetailPage() {
     });
   }, [id, isGuest]);
 
-  // -- Derived values --------------------------------------------------------
-
   const stats = useMemo(() => calculateDca(purchases), [purchases]);
-
   const totalExpensesForeign = useMemo(
     () => expenses.reduce((s, e) => s + e.amount_foreign, 0),
     [expenses],
   );
-
-  // -- Handlers --------------------------------------------------------------
+  const hasPurchases = purchases.length > 0;
 
   const handleDeletePurchase = useCallback(
     async (purchaseId: string) => {
@@ -74,8 +69,6 @@ export default function TripDetailPage() {
     await deleteExpense(expId);
     setExpenses((prev) => prev.filter((e) => e.id !== expId));
   }, []);
-
-  // -- Loading / Not found ---------------------------------------------------
 
   if (loading) {
     return (
@@ -117,32 +110,33 @@ export default function TripDetailPage() {
     );
   }
 
-  // -- Render ----------------------------------------------------------------
-
   return (
     <div className="min-h-dvh bg-background">
-      {/* ── Header ────────────────────────────────────────────────── */}
-      <header className="border-b border-border">
-        <div className="mx-auto max-w-2xl px-4 py-4">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-foreground"
-          >
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
+      <div className="mx-auto max-w-5xl px-6">
+        {/* ── Header ──────────────────────────────────────────────── */}
+        <header className="border-b border-border py-4">
+          <div className="flex items-center justify-between">
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-foreground"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15.75 19.5 8.25 12l7.5-7.5"
-              />
-            </svg>
-            Dashboard
-          </Link>
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 19.5 8.25 12l7.5-7.5"
+                />
+              </svg>
+              Dashboard
+            </Link>
+            <ThemeToggle />
+          </div>
           <div className="mt-3 flex items-center justify-between">
             <div>
               <h1 className="text-lg font-semibold text-foreground">
@@ -157,7 +151,7 @@ export default function TripDetailPage() {
                 <span
                   className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                     trip.is_active
-                      ? "bg-emerald-500/10 text-emerald-400"
+                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                       : "bg-muted/10 text-muted"
                   }`}
                 >
@@ -167,7 +161,9 @@ export default function TripDetailPage() {
             </div>
             <button
               onClick={() => setModalOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-3.5 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+              className={`inline-flex items-center gap-1.5 rounded-lg bg-accent px-3.5 py-2 text-sm font-semibold text-white shadow-md shadow-accent-glow transition-all hover:shadow-lg hover:shadow-accent-glow ${
+                !hasPurchases ? "animate-pulse" : ""
+              }`}
             >
               <svg
                 className="h-4 w-4"
@@ -182,122 +178,125 @@ export default function TripDetailPage() {
                   d="M12 4.5v15m7.5-7.5h-15"
                 />
               </svg>
-              Add Purchase
+              Log Cash Exchange
             </button>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* ── Main ──────────────────────────────────────────────────── */}
-      <main className="mx-auto max-w-2xl px-4 py-8">
-        {/* DCA summary cards */}
-        <DcaSummary
-          purchases={purchases}
-          homeCurrency={trip.home_currency}
-          targetCurrency={trip.target_currency}
-          totalExpensesForeign={totalExpensesForeign}
-        />
+        {/* ── Content ─────────────────────────────────────────────── */}
+        <div className="py-8">
+          {!hasPurchases && (
+            <p className="mb-4 text-center text-sm text-muted">
+              Start by logging your first cash exchange to calculate your rate.
+            </p>
+          )}
 
-        {/* Expense calculator */}
-        <div className="mt-4">
-          <ExpenseCalculator
-            trueRate={stats.trueRate}
+          {/* DCA summary cards */}
+          <DcaSummary
+            purchases={purchases}
             homeCurrency={trip.home_currency}
             targetCurrency={trip.target_currency}
+            totalExpensesForeign={totalExpensesForeign}
           />
-        </div>
 
-        {/* ── Tab bar ───────────────────────────────────────────────── */}
-        <div className="mt-8 rounded-xl border border-border/50 bg-card/30 p-1 backdrop-blur-md">
-          <div className="flex">
-            <button
-              onClick={() => setActiveTab("activity")}
-              className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition-all ${
-                activeTab === "activity"
-                  ? "bg-background/80 text-foreground shadow-sm"
-                  : "text-muted hover:text-foreground/70"
-              }`}
-            >
-              Activity
-            </button>
-            <button
-              onClick={() => setActiveTab("analytics")}
-              className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition-all ${
-                activeTab === "analytics"
-                  ? "bg-background/80 text-foreground shadow-sm"
-                  : "text-muted hover:text-foreground/70"
-              }`}
-            >
-              Analytics
-            </button>
+          {/* Expense calculator */}
+          <div className="mt-4">
+            <ExpenseCalculator
+              trueRate={stats.trueRate}
+              homeCurrency={trip.home_currency}
+              targetCurrency={trip.target_currency}
+              onLogExchange={() => setModalOpen(true)}
+            />
+          </div>
+
+          {/* ── Tab bar ─────────────────────────────────────────────── */}
+          <div className="mt-8 rounded-xl bg-[#f1f5f9] p-1 dark:bg-foreground/5">
+            <div className="flex">
+              <button
+                onClick={() => setActiveTab("activity")}
+                className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all ${
+                  activeTab === "activity"
+                    ? "bg-card text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:shadow-none"
+                    : "text-muted hover:text-foreground/70"
+                }`}
+              >
+                Activity
+              </button>
+              <button
+                onClick={() => setActiveTab("analytics")}
+                className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all ${
+                  activeTab === "analytics"
+                    ? "bg-card text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:shadow-none"
+                    : "text-muted hover:text-foreground/70"
+                }`}
+              >
+                Analytics
+              </button>
+            </div>
+          </div>
+
+          {/* ── Tab content ─────────────────────────────────────────── */}
+          <div className="mt-6">
+            {activeTab === "activity" ? (
+              <>
+                <div>
+                  <h2 className="mb-4 text-sm font-medium text-muted">
+                    Purchase History
+                    {purchases.length > 0 && (
+                      <span className="ml-2 text-foreground/40">
+                        ({purchases.length})
+                      </span>
+                    )}
+                  </h2>
+                  <PurchaseList
+                    purchases={purchases}
+                    homeCurrency={trip.home_currency}
+                    targetCurrency={trip.target_currency}
+                    onDelete={handleDeletePurchase}
+                  />
+                </div>
+
+                <div className="mt-12">
+                  <ExpenseLedger
+                    expenses={expenses}
+                    loading={expensesLoading}
+                    tripId={trip.id}
+                    trueRate={stats.trueRate}
+                    homeCurrency={trip.home_currency}
+                    targetCurrency={trip.target_currency}
+                    isGuest={isGuest}
+                    onCreated={(expense) =>
+                      setExpenses((prev) => [expense, ...prev])
+                    }
+                    onDelete={handleDeleteExpense}
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                {!isGuest && expenses.length > 0 ? (
+                  <SpendingPieChart
+                    expenses={expenses}
+                    targetCurrency={trip.target_currency}
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-16 text-center">
+                    <p className="text-sm font-medium text-foreground/70">
+                      No spending data yet
+                    </p>
+                    <p className="mt-1 text-sm text-muted">
+                      {isGuest
+                        ? "Sign up and log expenses to see your spending breakdown."
+                        : "Record spending on the Activity tab to see your breakdown."}
+                    </p>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </div>
+      </div>
 
-        {/* ── Tab content ───────────────────────────────────────────── */}
-        <div className="mt-6">
-          {activeTab === "activity" ? (
-            <>
-              {/* Purchase history */}
-              <div>
-                <h2 className="mb-4 text-sm font-medium text-muted">
-                  Purchase History
-                  {purchases.length > 0 && (
-                    <span className="ml-2 text-foreground/40">
-                      ({purchases.length})
-                    </span>
-                  )}
-                </h2>
-                <PurchaseList
-                  purchases={purchases}
-                  homeCurrency={trip.home_currency}
-                  targetCurrency={trip.target_currency}
-                  onDelete={handleDeletePurchase}
-                />
-              </div>
-
-              {/* Expense Ledger */}
-              <div className="mt-8">
-                <ExpenseLedger
-                  expenses={expenses}
-                  loading={expensesLoading}
-                  tripId={trip.id}
-                  trueRate={stats.trueRate}
-                  homeCurrency={trip.home_currency}
-                  targetCurrency={trip.target_currency}
-                  isGuest={isGuest}
-                  onCreated={(expense) =>
-                    setExpenses((prev) => [expense, ...prev])
-                  }
-                  onDelete={handleDeleteExpense}
-                />
-              </div>
-            </>
-          ) : (
-            <>
-              {/* Analytics: Spending breakdown */}
-              {!isGuest && expenses.length > 0 ? (
-                <SpendingPieChart
-                  expenses={expenses}
-                  targetCurrency={trip.target_currency}
-                />
-              ) : (
-                <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-16 text-center">
-                  <p className="text-sm font-medium text-foreground/70">
-                    No spending data yet
-                  </p>
-                  <p className="mt-1 text-sm text-muted">
-                    {isGuest
-                      ? "Sign up and log expenses to see your spending breakdown."
-                      : "Log expenses on the Activity tab to see your spending breakdown."}
-                  </p>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      </main>
-
-      {/* ── Add purchase modal ────────────────────────────────────── */}
       <AddPurchaseModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}

@@ -37,9 +37,9 @@ export function PurchaseList({
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border">
+    <div className="overflow-hidden rounded-xl border border-border/50">
       {/* Sticky header */}
-      <div className="sticky top-0 z-10 grid grid-cols-[4rem_1fr_1fr_5rem_2rem] items-center gap-2 border-b border-border bg-card px-4 py-2.5 text-xs font-medium text-muted">
+      <div className="sticky top-0 z-10 grid grid-cols-[4rem_1fr_1fr_5rem_2rem] items-center gap-2 border-b border-border/50 bg-background px-4 py-2.5 text-xs font-medium text-muted">
         <span>Date</span>
         <span className="text-right">Spent</span>
         <span className="text-right">Received</span>
@@ -52,7 +52,7 @@ export function PurchaseList({
         {purchases.map((p) => (
           <div
             key={p.id}
-            className="group grid grid-cols-[4rem_1fr_1fr_5rem_2rem] items-start gap-2 border-b border-border/50 px-4 py-3 last:border-b-0 hover:bg-card"
+            className="group grid grid-cols-[4rem_1fr_1fr_5rem_2rem] items-start gap-2 border-b border-border/30 bg-card px-4 py-3.5 last:border-b-0 hover:bg-card-hover/50"
           >
             <div>
               <span className="text-xs text-muted">
@@ -70,7 +70,7 @@ export function PurchaseList({
             <span className="text-right text-sm tabular-nums text-foreground">
               {formatAmount(p.home_amount, homeCurrency)}
               {p.fee_amount > 0 && (
-                <span className="text-amber-400/70">
+                <span className="text-rose-600 dark:text-amber-400">
                   {" "}+{formatAmount(p.fee_amount, homeCurrency)}
                 </span>
               )}{" "}
@@ -80,7 +80,7 @@ export function PurchaseList({
               {formatAmount(p.foreign_amount, targetCurrency)}{" "}
               <span className="text-muted">{targetCurrency}</span>
             </span>
-            <span className="text-right font-mono text-xs tabular-nums text-muted">
+            <span className="text-right text-sm tabular-nums text-muted">
               {formatRate(p.exchange_rate)}
             </span>
             <button

@@ -1,6 +1,18 @@
 @import "tailwindcss";
 
 :root {
+  --background: #f9fafb;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-hover: #f1f5f9;
+  --border: #cbd5e1;
+  --muted: #475569;
+  --accent: #1e293b;
+  --accent-glow: #1e293b20;
+  --destructive: #b91c1c;
+}
+
+.dark {
   --background: #09090b;
   --foreground: #fafafa;
   --card: #18181b;
@@ -8,6 +20,7 @@
   --border: #27272a;
   --muted: #a1a1aa;
   --accent: #3b82f6;
+  --accent-glow: #3b82f620;
   --destructive: #ef4444;
 }
 
@@ -19,21 +32,25 @@
   --color-border: var(--border);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
+  --color-accent-glow: var(--accent-glow);
   --color-destructive: var(--destructive);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-serif);
 }
 
 body {
+  margin: 0;
+  padding: 0;
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
-/* Dark-themed scrollbar for scrollable containers */
+/* Themed scrollbar */
 .scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: #27272a transparent;
+  scrollbar-color: var(--border) transparent;
 }
 .scrollbar-thin::-webkit-scrollbar {
   width: 6px;
@@ -42,9 +59,53 @@ body {
   background: transparent;
 }
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: var(--border);
   border-radius: 3px;
 }
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: var(--muted);
+}
+
+/* Button shine sweep */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.12) 50%,
+    transparent 70%
+  );
+  transform: translateX(-100%);
+  animation: shine 5s ease-in-out 2s infinite;
+}
+@keyframes shine {
+  0% {
+    transform: translateX(-100%);
+  }
+  12% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Floating calculator pulse */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+.animate-float {
+  animation: float 4s ease-in-out infinite;
 }

@@ -9,11 +9,11 @@ import type { Expense } from "@/lib/types";
 // -- Category styling --------------------------------------------------------
 
 const CATEGORY_STYLES: Record<string, string> = {
-  Food: "bg-amber-500/10 text-amber-400",
-  Transport: "bg-blue-500/10 text-blue-400",
-  Shopping: "bg-pink-500/10 text-pink-400",
-  Accommodation: "bg-violet-500/10 text-violet-400",
-  Other: "bg-foreground/5 text-muted",
+  Food: "bg-orange-100 text-orange-800 dark:bg-orange-500/10 dark:text-orange-400",
+  Transport: "bg-blue-100 text-blue-800 dark:bg-blue-500/10 dark:text-blue-400",
+  Shopping: "bg-pink-100 text-pink-800 dark:bg-pink-500/10 dark:text-pink-400",
+  Accommodation: "bg-violet-100 text-violet-800 dark:bg-violet-500/10 dark:text-violet-400",
+  Other: "bg-slate-100 text-slate-700 dark:bg-indigo-500/10 dark:text-indigo-400",
 };
 
 function categoryClass(cat: string): string {
@@ -84,10 +84,10 @@ export function ExpenseLedger({
         </h2>
         <button
           onClick={() => setModalOpen(true)}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-foreground/5"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-3.5 py-2 text-sm font-semibold text-white shadow-md shadow-accent-glow transition-all hover:shadow-lg hover:shadow-accent-glow"
         >
           <svg
-            className="h-3.5 w-3.5"
+            className="h-4 w-4"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={2}
@@ -99,7 +99,7 @@ export function ExpenseLedger({
               d="M12 4.5v15m7.5-7.5h-15"
             />
           </svg>
-          Add Expense
+          Record Spending
         </button>
       </div>
 
@@ -137,7 +137,7 @@ export function ExpenseLedger({
         </div>
       ) : (
         <>
-          <div className="scrollbar-thin max-h-[300px] overflow-y-auto rounded-xl border border-border sm:max-h-[400px]">
+          <div className="scrollbar-thin max-h-[300px] overflow-y-auto rounded-xl border border-border/50 sm:max-h-[400px]">
             {expenses.map((exp) => {
               const trueCost =
                 trueRate > 0 ? exp.amount_foreign / trueRate : 0;
@@ -145,7 +145,7 @@ export function ExpenseLedger({
               return (
                 <div
                   key={exp.id}
-                  className="group flex items-start gap-3 border-b border-border/50 px-4 py-3 last:border-b-0 hover:bg-card"
+                  className="group flex items-start gap-3 border-b border-border/30 bg-card px-4 py-3.5 last:border-b-0 hover:bg-card-hover/50"
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">

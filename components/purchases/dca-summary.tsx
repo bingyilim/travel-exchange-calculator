@@ -77,7 +77,7 @@ export function DcaSummary({
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
       {/* Total Spent */}
-      <div className="rounded-xl border border-border bg-card px-4 py-4">
+      <div className="rounded-xl border border-border/50 bg-card px-4 py-4">
         <p className="text-xs font-medium text-muted">Total Spent</p>
         <p className="mt-1.5 text-xl font-semibold tabular-nums text-foreground">
           {formatAmount(stats.totalCost, homeCurrency)}
@@ -85,7 +85,7 @@ export function DcaSummary({
         {hasFees ? (
           <p className="mt-0.5 text-xs text-muted">
             {homeCurrency}{" "}
-            <span className="text-amber-400/80">
+            <span className="text-rose-600 dark:text-amber-400">
               incl. {formatAmount(stats.totalFees, homeCurrency)} fees
             </span>
           </p>
@@ -95,7 +95,7 @@ export function DcaSummary({
       </div>
 
       {/* Total Received */}
-      <div className="rounded-xl border border-border bg-card px-4 py-4">
+      <div className="rounded-xl border border-border/50 bg-card px-4 py-4">
         <p className="text-xs font-medium text-muted">Total Received</p>
         <p className="mt-1.5 text-xl font-semibold tabular-nums text-foreground">
           {formatAmount(stats.totalForeign, targetCurrency)}

@@ -19,8 +19,8 @@ function formatDate(iso: string): string {
 export function TripList({ trips, onDelete }: Props) {
   if (trips.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-16 text-center">
-        <div className="mb-3 text-4xl opacity-30">&#9992;</div>
+      <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border py-16 text-center">
+        <div className="mb-3 text-4xl opacity-20">&#9992;</div>
         <p className="text-sm font-medium text-foreground/70">No trips yet</p>
         <p className="mt-1 text-sm text-muted">
           Create your first trip to start tracking exchange rates.
@@ -35,7 +35,11 @@ export function TripList({ trips, onDelete }: Props) {
         <Link
           key={trip.id}
           href={`/dashboard/trips/${trip.id}`}
-          className="group flex items-center justify-between rounded-xl border border-border bg-card px-5 py-4 transition-colors hover:bg-card-hover"
+          className={`group flex items-center justify-between rounded-lg border-l-[3px] border border-border/60 bg-card px-5 py-4 shadow-sm transition-all duration-300 hover:shadow-lg dark:shadow-none dark:hover:bg-card-hover dark:hover:shadow-none ${
+            trip.is_active
+              ? "border-l-emerald-500"
+              : "border-l-muted/30"
+          }`}
         >
           {/* Left: trip info */}
           <div className="min-w-0 flex-1">
@@ -46,7 +50,7 @@ export function TripList({ trips, onDelete }: Props) {
               <span
                 className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
                   trip.is_active
-                    ? "bg-emerald-500/10 text-emerald-400"
+                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400/90"
                     : "bg-muted/10 text-muted"
                 }`}
               >
@@ -54,9 +58,9 @@ export function TripList({ trips, onDelete }: Props) {
               </span>
             </div>
             <div className="mt-1.5 flex items-center gap-3 text-xs text-muted">
-              <span className="inline-flex items-center gap-1 rounded-md bg-foreground/5 px-2 py-0.5 font-mono text-foreground/70">
+              <span className="inline-flex items-center gap-1 rounded-md bg-foreground/[0.03] px-2 py-0.5 font-mono text-foreground/70">
                 {trip.home_currency}
-                <span className="text-muted/50">&rarr;</span>
+                <span className="text-muted/40">&rarr;</span>
                 {trip.target_currency}
               </span>
               <span>Created {formatDate(trip.created_at)}</span>
@@ -70,7 +74,7 @@ export function TripList({ trips, onDelete }: Props) {
               e.stopPropagation();
               onDelete(trip.id);
             }}
-            className="ml-4 shrink-0 rounded-lg p-2 text-muted/50 opacity-0 transition-all hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
+            className="ml-4 shrink-0 rounded-lg p-2 text-muted/40 opacity-0 transition-all hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
             aria-label={`Delete ${trip.name}`}
           >
             <svg

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   PieChart,
   Pie,
@@ -11,13 +11,12 @@ import {
 import { formatAmount } from "@/lib/utils/dca";
 import type { Expense } from "@/lib/types";
 
-// Category color palette (hex for recharts, matches Tailwind badge classes)
 const CATEGORY_COLORS: Record<string, string> = {
   Food: "#f59e0b",
   Transport: "#3b82f6",
   Shopping: "#ec4899",
   Accommodation: "#8b5cf6",
-  Other: "#6b7280",
+  Other: "#6366f1",
 };
 
 function getColor(category: string): string {
@@ -35,8 +34,6 @@ type CategoryData = {
   color: string;
 };
 
-// -- Custom tooltip ----------------------------------------------------------
-
 function ChartTooltip({
   active,
   payload,
@@ -53,16 +50,31 @@ function ChartTooltip({
   const pct = total > 0 ? (data.value / total) * 100 : 0;
 
   return (
-    <div className="rounded-lg border border-border/50 bg-card/80 px-3 py-2 shadow-lg backdrop-blur-md">
-      <p className="text-sm font-medium text-foreground">{data.name}</p>
-      <p className="mt-0.5 tabular-nums text-xs text-muted">
-        {formatAmount(data.value, currency)} {currency} ({pct.toFixed(1)}%)
-      </p>
+    <div className="min-w-[160px] overflow-hidden rounded-2xl border border-white/20 bg-card/80 shadow-2xl shadow-black/10 backdrop-blur-xl dark:border-white/10 dark:bg-card/70 dark:shadow-black/40">
+      {/* Color accent bar */}
+      <div className="h-1" style={{ backgroundColor: data.color }} />
+      <div className="px-4 py-3.5">
+        <p className="text-sm font-semibold text-foreground">{data.name}</p>
+        <p className="mt-2 text-2xl font-bold tabular-nums text-foreground">
+          {formatAmount(data.value, currency)}{" "}
+          <span className="text-sm font-normal text-muted">{currency}</span>
+        </p>
+        <div className="mt-2 flex items-center gap-2">
+          {/* Mini progress bar */}
+          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-foreground/5">
+            <div
+              className="h-full rounded-full"
+              style={{ width: `${pct}%`, backgroundColor: data.color }}
+            />
+          </div>
+          <span className="shrink-0 tabular-nums text-xs font-medium text-muted">
+            {pct.toFixed(1)}%
+          </span>
+        </div>
+      </div>
     </div>
   );
 }
-
-// -- Component ---------------------------------------------------------------
 
 export function SpendingPieChart({ expenses, targetCurrency }: Props) {
   const data = useMemo<CategoryData[]>(() => {
@@ -80,17 +92,26 @@ export function SpendingPieChart({ expenses, targetCurrency }: Props) {
 
   const total = data.reduce((s, d) => s + d.value, 0);
 
+  const [hasInteracted, setHasInteracted] = useState(false);
+
   if (data.length === 0) return null;
 
   return (
-    <div className="rounded-xl border border-border bg-card px-5 py-5">
-      <h3 className="text-sm font-medium text-muted">Spending Breakdown</h3>
+    <div className="rounded-xl border border-border/50 bg-card px-5 py-5">
+      <div className="flex items-baseline justify-between">
+        <h3 className="text-sm font-medium text-muted">Spending Breakdown</h3>
+        {!hasInteracted && (
+          <p className="text-xs text-muted/50">Tap a slice for details</p>
+        )}
+      </div>
 
       <div className="mt-4 flex flex-col items-center gap-6 sm:flex-row">
-        {/* Chart — fixed min-height prevents collapse on tab switch */}
+        {/* Chart */}
         <div
-          className="h-44 w-44 shrink-0 [&_*]:outline-none"
-          style={{ minHeight: 176 }}
+          className="h-52 w-52 shrink-0 [&_*]:outline-none"
+          style={{ minHeight: 208 }}
+          onMouseEnter={() => setHasInteracted(true)}
+          onTouchStart={() => setHasInteracted(true)}
         >
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
@@ -98,8 +119,8 @@ export function SpendingPieChart({ expenses, targetCurrency }: Props) {
                 data={data}
                 cx="50%"
                 cy="50%"
-                innerRadius={48}
-                outerRadius={72}
+                innerRadius={52}
+                outerRadius={84}
                 paddingAngle={3}
                 dataKey="value"
                 stroke="none"
@@ -125,30 +146,31 @@ export function SpendingPieChart({ expenses, targetCurrency }: Props) {
           </ResponsiveContainer>
         </div>
 
-        {/* Legend */}
+        {/* Legend — filter out 0% categories */}
         <div className="flex-1 space-y-2.5">
-          {data.map((entry) => {
-            const pct = total > 0 ? (entry.value / total) * 100 : 0;
-            return (
-              <div key={entry.name} className="flex items-center gap-3">
-                <span
-                  className="h-2.5 w-2.5 shrink-0 rounded-full"
-                  style={{ backgroundColor: entry.color }}
-                />
-                <span className="flex-1 text-sm text-foreground">
-                  {entry.name}
-                </span>
-                <span className="tabular-nums text-sm text-foreground">
-                  {formatAmount(entry.value, targetCurrency)}
-                </span>
-                <span className="w-10 text-right tabular-nums text-xs text-muted">
-                  {pct.toFixed(0)}%
-                </span>
-              </div>
-            );
-          })}
+          {data
+            .filter((entry) => entry.value > 0)
+            .map((entry) => {
+              const pct = total > 0 ? (entry.value / total) * 100 : 0;
+              return (
+                <div key={entry.name} className="flex items-center gap-3">
+                  <span
+                    className="h-2.5 w-2.5 shrink-0 rounded-full"
+                    style={{ backgroundColor: entry.color }}
+                  />
+                  <span className="flex-1 text-sm font-medium text-foreground">
+                    {entry.name}
+                  </span>
+                  <span className="tabular-nums text-sm font-medium text-foreground">
+                    {formatAmount(entry.value, targetCurrency)}
+                  </span>
+                  <span className="w-10 text-right tabular-nums text-xs text-muted">
+                    {pct.toFixed(0)}%
+                  </span>
+                </div>
+              );
+            })}
 
-          {/* Total */}
           <div className="flex items-center gap-3 border-t border-border/50 pt-2.5">
             <span className="h-2.5 w-2.5 shrink-0" />
             <span className="flex-1 text-sm font-medium text-muted">

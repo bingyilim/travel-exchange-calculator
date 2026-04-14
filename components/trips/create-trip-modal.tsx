@@ -155,14 +155,14 @@ export function CreateTripModal({ open, onClose, onCreated }: Props) {
                 reset();
                 onClose();
               }}
-              className="rounded-lg px-4 py-2 text-sm font-medium text-muted transition-colors hover:text-foreground"
+              className="rounded-lg px-4 py-2 text-sm font-medium text-[#64748b] transition-colors hover:text-foreground dark:text-zinc-400 dark:hover:text-white"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-accent-glow transition-all hover:shadow-md hover:shadow-accent-glow disabled:opacity-50"
             >
               {saving ? "Creating..." : "Create Trip"}
             </button>
