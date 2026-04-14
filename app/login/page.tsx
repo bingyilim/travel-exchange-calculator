@@ -232,15 +232,38 @@ export default function LoginPage() {
 
       {/* ── Right: Brand panel (desktop only) ───────────────────────── */}
       <div className="relative hidden flex-1 overflow-hidden lg:block">
-        {/* Light: radial spotlight. Dark: flat navy */}
-        <div
-          className="absolute inset-0 dark:hidden"
-          style={{
-            background:
-              "radial-gradient(ellipse at 50% 40%, #1e3a5f 0%, #0f172a 70%)",
-          }}
-        />
-        <div className="absolute inset-0 hidden bg-[#0f172a] dark:block" />
+        {/* Light: flat navy */}
+        <div className="absolute inset-0 bg-[#0f172a] dark:hidden" />
+        {/* Dark: meteor shower */}
+        <div className="absolute inset-0 hidden dark:block">
+          <div className="absolute inset-0 bg-[#09090b]" />
+          <div className="absolute inset-0 overflow-hidden [&>.meteor]:absolute [&>.meteor]:h-[1px] [&>.meteor]:rotate-[-35deg] [&>.meteor]:bg-gradient-to-r [&>.meteor]:from-white/30 [&>.meteor]:to-transparent [&>.meteor]:opacity-0">
+            <div className="meteor w-24" style={{ top: "8%", left: "75%", animation: "meteor 3s linear 0s infinite" }} />
+            <div className="meteor w-16" style={{ top: "18%", left: "55%", animation: "meteor 4s linear 1.8s infinite" }} />
+            <div className="meteor w-32" style={{ top: "30%", left: "85%", animation: "meteor 3.5s linear 0.6s infinite" }} />
+            <div className="meteor w-12" style={{ top: "45%", left: "65%", animation: "meteor 5s linear 2.8s infinite" }} />
+            <div className="meteor w-20" style={{ top: "12%", left: "40%", animation: "meteor 3s linear 3.5s infinite" }} />
+            <div className="meteor w-14" style={{ top: "60%", left: "80%", animation: "meteor 4.5s linear 1.2s infinite" }} />
+            <div className="meteor w-28" style={{ top: "25%", left: "30%", animation: "meteor 3s linear 4.2s infinite" }} />
+            <div className="meteor w-10" style={{ top: "50%", left: "45%", animation: "meteor 5s linear 2.2s infinite" }} />
+          </div>
+          {/* Stars */}
+          <div className="absolute h-[2px] w-[2px] rounded-full bg-white/25" style={{ top: "5%", left: "15%" }} />
+          <div className="absolute h-[1px] w-[1px] rounded-full bg-white/20" style={{ top: "12%", left: "82%" }} />
+          <div className="absolute h-[2px] w-[2px] rounded-full bg-white/15" style={{ top: "22%", left: "35%" }} />
+          <div className="absolute h-[1px] w-[1px] rounded-full bg-white/25" style={{ top: "28%", left: "60%" }} />
+          <div className="absolute h-[1px] w-[1px] rounded-full bg-white/10" style={{ top: "38%", left: "18%" }} />
+          <div className="absolute h-[2px] w-[2px] rounded-full bg-white/20" style={{ top: "42%", left: "90%" }} />
+          <div className="absolute h-[1px] w-[1px] rounded-full bg-white/15" style={{ top: "52%", left: "28%" }} />
+          <div className="absolute h-[2px] w-[2px] rounded-full bg-white/10" style={{ top: "58%", left: "72%" }} />
+          <div className="absolute h-[1px] w-[1px] rounded-full bg-white/25" style={{ top: "65%", left: "50%" }} />
+          <div className="absolute h-[2px] w-[2px] rounded-full bg-white/15" style={{ top: "72%", left: "12%" }} />
+          <div className="absolute h-[1px] w-[1px] rounded-full bg-white/20" style={{ top: "78%", left: "88%" }} />
+          <div className="absolute h-[2px] w-[2px] rounded-full bg-white/10" style={{ top: "82%", left: "42%" }} />
+          <div className="absolute h-[1px] w-[1px] rounded-full bg-white/15" style={{ top: "88%", left: "68%" }} />
+          <div className="absolute h-[1px] w-[1px] rounded-full bg-white/20" style={{ top: "92%", left: "25%" }} />
+          <div className="absolute h-[2px] w-[2px] rounded-full bg-white/10" style={{ top: "95%", left: "55%" }} />
+        </div>
 
         <div className="relative flex h-full flex-col items-center justify-center px-12">
           <ThemeToggle />

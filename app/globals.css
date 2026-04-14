@@ -111,3 +111,30 @@ body {
 .animate-float {
   animation: float 4s ease-in-out infinite;
 }
+
+/* Aurora motion for login panel */
+@keyframes aurora {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(5%, -5%);
+  }
+}
+
+/* Meteor streak */
+@keyframes meteor {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  40% {
+    transform: translateX(-500px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(-500px);
+    opacity: 0;
+  }
+}
