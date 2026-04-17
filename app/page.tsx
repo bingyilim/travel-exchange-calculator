@@ -29,14 +29,14 @@ export default function LandingPage() {
   return (
     <div className="relative min-h-dvh bg-background">
       {/* ── Background mesh ─────────────────────────────────────────── */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute left-1/4 top-0 h-[600px] w-[800px] -translate-x-1/2 rounded-full bg-blue-400/6 blur-[120px] dark:bg-blue-500/10" />
         <div className="absolute right-0 top-1/4 h-[500px] w-[500px] rounded-full bg-violet-400/6 blur-[120px] dark:bg-violet-500/8" />
         <div className="absolute bottom-0 left-1/2 h-[400px] w-[700px] -translate-x-1/2 rounded-full bg-amber-300/4 blur-[120px] dark:bg-amber-500/5" />
       </div>
 
       {/* ── Floating Nav ────────────────────────────────────────────── */}
-      <nav className="sticky top-0 z-50 pt-4">
+      <nav className="sticky top-0 z-50 px-4 pt-4">
         <div className="mx-auto flex max-w-6xl items-center justify-between rounded-2xl border border-border/50 bg-card/30 px-6 py-3.5 backdrop-blur-md dark:bg-card/30">
           <Link href="/" className="flex items-center gap-2.5">
             <Logo />
