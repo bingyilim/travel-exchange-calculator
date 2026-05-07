@@ -29,23 +29,18 @@ export function DcaSummary({
   const isLow =
     hasPurchases && remaining >= 0 && remaining < stats.totalForeign * 0.1;
 
-  let walletColor = "text-emerald-400";
-  let walletBorder = "border-emerald-500/20 bg-emerald-500/5";
-  let walletLabelColor = "text-emerald-400";
+  let walletColor = "text-emerald-600 dark:text-emerald-400";
+  let walletLabelColor = "text-emerald-600 dark:text-emerald-400";
 
   if (!hasPurchases) {
-    // No purchases: neutral card regardless of expenses
     walletColor = "text-foreground";
-    walletBorder = "border-border bg-card";
     walletLabelColor = "text-muted";
   } else if (isOverspent) {
     walletColor = "text-destructive";
-    walletBorder = "border-destructive/20 bg-destructive/5";
     walletLabelColor = "text-destructive";
   } else if (isLow) {
-    walletColor = "text-amber-400";
-    walletBorder = "border-amber-500/20 bg-amber-500/5";
-    walletLabelColor = "text-amber-400";
+    walletColor = "text-stamp";
+    walletLabelColor = "text-stamp";
   }
 
   // Wallet display value and subtext
@@ -53,15 +48,12 @@ export function DcaSummary({
   let walletSubtext: React.ReactNode;
 
   if (!hasPurchases && !hasExpenses) {
-    // Empty state
     walletValue = "—";
     walletSubtext = "No purchases yet";
   } else if (!hasPurchases && hasExpenses) {
-    // Expenses only, no purchases to calculate balance from
     walletValue = formatAmount(totalExpensesForeign, targetCurrency);
     walletSubtext = "spent · add a purchase to see balance";
   } else if (hasPurchases && hasExpenses && stats.trueRate > 0) {
-    // Full data: show true value in home currency
     walletValue = formatAmount(remaining, targetCurrency);
     walletSubtext = (
       <>
@@ -69,87 +61,85 @@ export function DcaSummary({
       </>
     );
   } else {
-    // Has purchases, no expenses (or no rate yet)
     walletValue = formatAmount(remaining, targetCurrency);
     walletSubtext = targetCurrency;
   }
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <div className="grid grid-cols-2 sm:grid-cols-4 border border-foreground/80 bg-card">
       {/* Total Spent */}
-      <div className="rounded-xl border border-border/50 bg-card px-4 py-4">
-        <p className="text-xs font-medium text-muted">Total Spent</p>
-        <p className="mt-1.5 text-xl font-semibold tabular-nums text-foreground">
+      <div className="px-5 py-5 border-r border-border last:border-r-0 sm:[&:nth-child(2)]:border-r-0 sm:[&:nth-child(2)]:sm:border-r border-b sm:border-b-0 sm:[&:nth-child(-n+2)]:border-b-0">
+        <p className="font-mono text-[9px] font-medium uppercase tracking-[0.22em] text-muted mb-2.5">
+          Total spent
+        </p>
+        <p className="font-serif text-3xl text-accent leading-none tabular-nums">
           {formatAmount(stats.totalCost, homeCurrency)}
         </p>
-        {hasFees ? (
-          <p className="mt-0.5 text-xs text-muted">
-            {homeCurrency}{" "}
-            <span className="text-[#e11d48] dark:text-[#fbbf24]">
+        <div className="mt-2 flex justify-between font-mono text-[10px] tracking-wide text-foreground/70">
+          <span>{homeCurrency}</span>
+          {hasFees && (
+            <span className="text-stamp">
               incl. {formatAmount(stats.totalFees, homeCurrency)} fees
             </span>
-          </p>
-        ) : (
-          <p className="mt-0.5 text-xs text-muted">{homeCurrency}</p>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Total Received */}
-      <div className="rounded-xl border border-border/50 bg-card px-4 py-4">
-        <p className="text-xs font-medium text-muted">Total Received</p>
-        <p className="mt-1.5 text-xl font-semibold tabular-nums text-foreground">
+      <div className="px-5 py-5 border-r border-border last:border-r-0 border-b sm:border-b-0 sm:[&:nth-child(-n+2)]:border-b-0">
+        <p className="font-mono text-[9px] font-medium uppercase tracking-[0.22em] text-muted mb-2.5">
+          Total received
+        </p>
+        <p className="font-serif text-3xl text-accent leading-none tabular-nums">
           {formatAmount(stats.totalForeign, targetCurrency)}
         </p>
-        <p className="mt-0.5 text-xs text-muted">{targetCurrency}</p>
+        <div className="mt-2 font-mono text-[10px] tracking-wide text-foreground/70">
+          {targetCurrency}
+        </div>
       </div>
 
-      {/* Blended Rate */}
-      <div className="rounded-xl border border-accent/20 bg-accent/5 px-4 py-4">
-        <p className="text-xs font-medium text-accent">
-          {hasFees ? "True Rate" : "Blended Rate"}
+      {/* True Rate (highlighted) */}
+      <div className="px-5 py-5 border-r border-border last:border-r-0 bg-stamp/[0.04]">
+        <p className="font-mono text-[9px] font-medium uppercase tracking-[0.22em] text-stamp mb-2.5">
+          {hasFees ? "True rate" : "Blended rate"}
         </p>
-        <p className="mt-1.5 text-xl font-semibold tabular-nums text-foreground">
+        <p className="font-serif text-3xl text-accent leading-none tabular-nums">
           {formatRate(stats.trueRate)}
         </p>
-        {hasFees ? (
-          <p className="mt-0.5 text-xs text-muted">
-            {targetCurrency}/{homeCurrency}{" "}
-            <span className="text-foreground/40">
+        <div className="mt-2 flex justify-between font-mono text-[10px] tracking-wide text-foreground/70">
+          <span>
+            {targetCurrency}/{homeCurrency}
+          </span>
+          {hasFees && (
+            <span className="text-muted">
               nom. {formatRate(stats.nominalRate)}
             </span>
-          </p>
-        ) : (
-          <p className="mt-0.5 text-xs text-muted">
-            {targetCurrency}/{homeCurrency}
-          </p>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Wallet */}
-      <div
-        className={`rounded-xl border px-4 py-4 transition-colors ${walletBorder}`}
-      >
-        <div className="flex items-center gap-2">
-          <p className={`text-xs font-medium ${walletLabelColor}`}>Wallet</p>
+      <div className="px-5 py-5">
+        <div className="flex items-center gap-2 mb-2.5">
+          <p
+            className={`font-mono text-[9px] font-medium uppercase tracking-[0.22em] ${walletLabelColor}`}
+          >
+            Wallet
+          </p>
           {isOverspent && (
-            <span className="rounded bg-destructive/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-destructive">
-              Overspent
+            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-destructive">
+              · Overspent
             </span>
           )}
         </div>
         <p
-          className={`mt-1.5 text-xl font-semibold tabular-nums transition-colors ${walletColor}`}
+          className={`font-serif text-3xl leading-none tabular-nums ${walletColor}`}
         >
-          {walletValue}{" "}
-          {walletValue !== "—" && (
-            <span
-              className={`text-sm font-normal ${hasPurchases ? walletColor : "text-muted"}`}
-            >
-              {targetCurrency}
-            </span>
-          )}
+          {walletValue}
         </p>
-        <p className="mt-0.5 text-xs text-muted">{walletSubtext}</p>
+        <div className="mt-2 font-mono text-[10px] tracking-wide text-foreground/70">
+          {walletSubtext}
+        </div>
       </div>
     </div>
   );

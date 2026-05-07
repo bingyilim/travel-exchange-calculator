@@ -25,11 +25,11 @@ export function PurchaseList({
 }: Props) {
   if (purchases.length === 0) {
     return (
-      <div className="flex max-h-[300px] flex-col items-center justify-center rounded-xl border border-dashed border-border py-12 text-center sm:max-h-[400px]">
-        <p className="text-sm font-medium text-foreground/70">
+      <div className="flex flex-col items-center justify-center border border-dashed border-border py-12 text-center">
+        <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-muted">
           No purchases yet
         </p>
-        <p className="mt-1 text-sm text-muted">
+        <p className="mt-2 font-serif italic text-sm text-muted">
           Add your first exchange to start tracking your DCA rate.
         </p>
       </div>
@@ -37,9 +37,9 @@ export function PurchaseList({
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border/50">
-      {/* Sticky header */}
-      <div className="sticky top-0 z-10 grid grid-cols-[4rem_1fr_1fr_5rem_2rem] items-center gap-2 border-b border-border/50 bg-background px-4 py-2.5 text-xs font-medium text-muted">
+    <div className="overflow-hidden border border-foreground/80 bg-card">
+      {/* Header row */}
+      <div className="sticky top-0 z-10 grid grid-cols-[4rem_1fr_1fr_5rem_2rem] items-center gap-2 border-b-[1.5px] border-foreground bg-foreground/[0.03] px-4 py-2.5 font-mono text-[9px] uppercase tracking-[0.22em] text-muted">
         <span>Date</span>
         <span className="text-right">Spent</span>
         <span className="text-right">Received</span>
@@ -48,44 +48,49 @@ export function PurchaseList({
       </div>
 
       {/* Scrollable rows */}
-      <div className="scrollbar-thin max-h-[300px] overflow-y-auto sm:max-h-[400px]">
+      <div className="max-h-[400px] overflow-y-auto">
         {purchases.map((p) => (
           <div
             key={p.id}
-            className="group grid grid-cols-[4rem_1fr_1fr_5rem_2rem] items-start gap-2 border-b border-border/30 bg-card px-4 py-3.5 last:border-b-0 hover:bg-card-hover/50"
+            className="group grid grid-cols-[4rem_1fr_1fr_5rem_2rem] items-start gap-2 border-b border-border px-4 py-3.5 last:border-b-0"
           >
             <div>
-              <span className="text-xs text-muted">
+              <span className="font-mono text-[11px] text-muted">
                 {formatDate(p.purchased_at)}
               </span>
               {p.notes && (
-                <p
-                  className="mt-1 truncate text-xs text-muted/50"
-                  title={p.notes}
-                >
+                <p className="mt-1 font-serif italic text-[11px] text-muted break-words">
                   {p.notes}
                 </p>
               )}
             </div>
-            <span className="text-right text-sm tabular-nums text-foreground">
+            <span className="text-right font-mono text-[13px] tabular-nums text-foreground">
               {formatAmount(p.home_amount, homeCurrency)}
               {p.fee_amount > 0 && (
-                <span className="text-[#e11d48] dark:text-[#fbbf24]">
+                <span className="text-stamp">
                   {" "}+{formatAmount(p.fee_amount, homeCurrency)}
                 </span>
-              )}{" "}
-              <span className="text-muted">{homeCurrency}</span>
+              )}
+              <span className="ml-1.5 text-[10px] text-muted">
+                {homeCurrency}
+              </span>
             </span>
-            <span className="text-right text-sm tabular-nums text-foreground">
-              {formatAmount(p.foreign_amount, targetCurrency)}{" "}
-              <span className="text-muted">{targetCurrency}</span>
+            <span className="text-right font-mono text-[13px] tabular-nums text-foreground">
+              {formatAmount(p.foreign_amount, targetCurrency)}
+              <span className="ml-1.5 text-[10px] text-muted">
+                {targetCurrency}
+              </span>
             </span>
-            <span className="text-right text-sm tabular-nums text-muted">
+            <span className="text-right font-mono text-[13px] tabular-nums text-muted">
               {formatRate(p.exchange_rate)}
             </span>
             <button
-              onClick={() => onDelete(p.id)}
-              className="ml-auto shrink-0 rounded p-1 text-muted/30 opacity-0 transition-all hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
+              onClick={() => {
+                if (confirm("Delete this purchase? This cannot be undone.")) {
+                  onDelete(p.id);
+                }
+              }}
+              className="ml-auto shrink-0 p-1 text-muted/60 transition-colors hover:text-destructive sm:opacity-0 sm:group-hover:opacity-100"
               aria-label="Delete purchase"
             >
               <svg

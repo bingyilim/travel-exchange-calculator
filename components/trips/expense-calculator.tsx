@@ -23,7 +23,6 @@ export function ExpenseCalculator({
   const homeCost = trueRate > 0 ? priceNum / trueRate : 0;
   const hasRate = trueRate > 0;
   const isTyping = priceNum > 0;
-  const needsRate = isTyping && !hasRate;
 
   // Auto-focus the input on mount
   useEffect(() => {
@@ -31,72 +30,73 @@ export function ExpenseCalculator({
   }, []);
 
   return (
-    <div
-      className={`rounded-xl border bg-card px-5 py-5 transition-colors ${
-        needsRate ? "border-amber-500/40" : "border-border"
-      }`}
-    >
-      <h3 className="text-sm font-medium text-muted">
-        What does it cost me?
-      </h3>
-
-      <div className="mt-3 flex items-center gap-3">
-        <div className="relative flex-1">
-          <input
-            ref={inputRef}
-            type="number"
-            min="0"
-            step="any"
-            value={foreignPrice}
-            onChange={(e) => setForeignPrice(e.target.value)}
-            placeholder="0"
-            className={`w-full rounded-lg border bg-foreground/[0.02] py-3 pl-4 pr-14 text-lg tabular-nums text-foreground placeholder:text-muted/30 focus:outline-none focus:ring-1 transition-colors dark:bg-card ${
-              needsRate
-                ? "border-amber-500/40 focus:border-amber-500/50 focus:ring-amber-500/30"
-                : "border-border focus:border-accent/50 focus:ring-accent/50"
-            }`}
-          />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-muted">
-            {targetCurrency}
-          </span>
+    <div className="border border-foreground/80 bg-card px-6 sm:px-9 py-8">
+      <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] gap-6 sm:gap-10 items-end">
+        {/* LEFT — Foreign price */}
+        <div className="w-full min-w-0">
+          <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted mb-2">
+            Foreign price
+          </div>
+          <div className="flex w-full items-end gap-3 h-14 border-b-[1.5px] border-foreground pb-1.5">
+            <input
+              ref={inputRef}
+              type="number"
+              min="0"
+              step="any"
+              value={foreignPrice}
+              onChange={(e) => setForeignPrice(e.target.value)}
+              placeholder="0"
+              className="flex-1 min-w-0 bg-transparent border-none outline-none font-serif text-4xl sm:text-[42px] text-accent leading-none tracking-tight p-0"
+              style={{ height: 50 }}
+            />
+            <span className="font-mono text-sm text-foreground/70 tracking-wider pb-1">
+              {targetCurrency}
+            </span>
+          </div>
         </div>
 
-        <svg
-          className="h-5 w-5 shrink-0 text-muted/40"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-          />
-        </svg>
-
-        <div className="flex-1 rounded-lg bg-accent/5 py-2.5 text-center">
-          {needsRate ? (
+        {/* MIDDLE — rate marker (its own column, no overlap) */}
+        <div className="text-center pb-3 sm:px-2">
+          {hasRate ? (
+            <>
+              <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-stamp mb-1 whitespace-nowrap">
+                @ {trueRate.toFixed(2)}
+              </div>
+              <div className="text-xl text-muted leading-none">→</div>
+              <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted mt-1 whitespace-nowrap">
+                True rate
+              </div>
+            </>
+          ) : (
             <button
               type="button"
               onClick={onLogExchange}
-              className="group px-2"
+              className="font-mono text-[10px] uppercase tracking-[0.18em] text-stamp hover:text-foreground transition-colors text-center whitespace-nowrap"
             >
-              <p className="text-sm font-medium text-amber-400">
-                Log an exchange
-              </p>
-              <p className="mt-0.5 text-xs text-muted group-hover:text-foreground">
-                to see true cost
-              </p>
+              Log exchange
+              <br />
+              to compute
             </button>
-          ) : (
-            <>
-              <p className="text-lg font-semibold tabular-nums text-foreground">
-                {isTyping ? formatAmount(homeCost, homeCurrency) : "0"}
-              </p>
-              <p className="text-xs text-muted">{homeCurrency}</p>
-            </>
           )}
+        </div>
+
+        {/* RIGHT — Home cost */}
+        <div className="w-full min-w-0">
+          <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted mb-2">
+            Home cost
+          </div>
+          <div className="flex w-full items-end gap-3 h-14 border-b-[1.5px] border-foreground pb-1.5">
+            <span
+              className={`flex-1 min-w-0 font-serif text-4xl sm:text-[42px] leading-none tracking-tight ${
+                isTyping && hasRate ? "text-accent" : "text-muted"
+              }`}
+            >
+              {isTyping && hasRate ? formatAmount(homeCost, homeCurrency) : "—"}
+            </span>
+            <span className="font-mono text-sm text-foreground/70 tracking-wider pb-1">
+              {homeCurrency}
+            </span>
+          </div>
         </div>
       </div>
     </div>

@@ -10,15 +10,15 @@ import { ExpenseCalculator } from "@/components/trips/expense-calculator";
 import { PurchaseList } from "@/components/purchases/purchase-list";
 import { AddPurchaseModal } from "@/components/purchases/add-purchase-modal";
 import { ExpenseLedger } from "@/components/expenses/expense-ledger";
-import { SpendingPieChart } from "@/components/expenses/spending-pie-chart";
+// import { SpendingPieChart } from "@/components/expenses/spending-pie-chart";
+import { SpendingBars } from "@/components/expenses/spending-bars";
+import { AddExpenseModal } from "@/components/expenses/add-expense-modal";
 import {
   getExpensesByTrip,
   deleteExpense,
 } from "@/app/actions/expenses";
 import { calculateDca } from "@/lib/utils/dca";
 import type { Trip, Purchase, Expense } from "@/lib/types";
-
-type Tab = "activity" | "analytics";
 
 export default function TripDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -30,7 +30,7 @@ export default function TripDetailPage() {
   const [loading, setLoading] = useState(true);
   const [expensesLoading, setExpensesLoading] = useState(!isGuest);
   const [modalOpen, setModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<Tab>("activity");
+  const [expenseModalOpen, setExpenseModalOpen] = useState(false);
 
   useEffect(() => {
     Promise.all([storage.getTrip(id), storage.getPurchasesForTrip(id)]).then(
@@ -112,189 +112,169 @@ export default function TripDetailPage() {
 
   return (
     <div className="min-h-dvh bg-background">
-      <div className="mx-auto max-w-5xl px-6">
-        {/* ── Header ──────────────────────────────────────────────── */}
-        <header className="border-b border-border py-4">
-          <div className="flex items-center justify-between">
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-foreground"
-            >
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15.75 19.5 8.25 12l7.5-7.5"
-                />
-              </svg>
-              Dashboard
-            </Link>
-            <ThemeToggle />
-          </div>
-          <div className="mt-3 flex items-center justify-between">
+      <div className="mx-auto max-w-5xl px-6 sm:px-14 pb-20">
+        {/* Top doc strip */}
+        <div className="flex items-center justify-between pt-6 pb-3.5 font-mono text-[10px] uppercase tracking-[0.22em] text-muted">
+          <Link
+            href="/dashboard"
+            className="text-foreground/70 hover:text-foreground transition-colors"
+          >
+            ← Dashboard
+          </Link>
+          <span className="hidden sm:inline">
+            Doc № TX-{new Date(trip.created_at).getFullYear()} · Entry{" "}
+            {String(purchases.length).padStart(2, "0")}
+          </span>
+          <ThemeToggle />
+        </div>
+
+        {/* Header — trip identity */}
+        <header className="border-t-2 border-foreground border-b border-border py-7">
+          <div className="grid grid-cols-1 sm:grid-cols-[1.4fr_auto] gap-6 sm:items-end">
             <div>
-              <h1 className="text-lg font-semibold text-foreground">
+              <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-stamp mb-2">
+                Trip Ledger · {trip.is_active ? "Active" : "Closed"}
+              </div>
+              <h1 className="font-serif text-5xl sm:text-6xl text-accent leading-[0.95] tracking-tight">
                 {trip.name}
               </h1>
-              <div className="mt-1 flex items-center gap-2">
-                <span className="inline-flex items-center gap-1 rounded-md bg-foreground/5 px-2 py-0.5 font-mono text-xs text-foreground/70">
-                  {trip.home_currency}
-                  <span className="text-muted/50">&rarr;</span>
-                  {trip.target_currency}
-                </span>
-                <span
-                  className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                    trip.is_active
-                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                      : "bg-muted/10 text-muted"
-                  }`}
-                >
-                  {trip.is_active ? "Active" : "Closed"}
+              <div className="mt-3.5 font-mono text-sm text-foreground/70 tracking-wider">
+                {trip.home_currency}
+                <span className="text-muted mx-2">▸</span>
+                <span className="text-stamp">{trip.target_currency}</span>
+                <span className="text-muted mx-3">·</span>
+                <span className="text-[11px] uppercase tracking-[0.1em]">
+                  Issued{" "}
+                  {new Date(trip.created_at).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
                 </span>
               </div>
             </div>
             <button
               onClick={() => setModalOpen(true)}
-              className={`inline-flex items-center gap-1.5 rounded-lg bg-accent px-3.5 py-2 text-sm font-semibold text-white shadow-md shadow-accent-glow transition-all hover:shadow-lg hover:shadow-accent-glow ${
-                !hasPurchases ? "animate-pulse" : ""
-              }`}
+              className="btn-doc self-start sm:self-auto"
+              style={{
+                background: "var(--accent)",
+                color: "var(--background)",
+                borderColor: "var(--accent)",
+              }}
             >
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 4.5v15m7.5-7.5h-15"
-                />
-              </svg>
-              Log Cash Exchange
+              + Log exchange
             </button>
           </div>
         </header>
 
-        {/* ── Content ─────────────────────────────────────────────── */}
-        <div className="py-8">
-          {!hasPurchases && (
-            <p className="mb-4 text-center text-sm text-muted">
-              Start by logging your first cash exchange to calculate your rate.
-            </p>
-          )}
+        {/* Empty-state nudge */}
+        {!hasPurchases && (
+          <p className="mt-8 mb-2 font-serif italic text-foreground/70 text-center">
+            Begin by logging your first cash exchange — your true rate will
+            appear here.
+          </p>
+        )}
 
-          {/* DCA summary cards */}
+        {/* § I — Ledger Summary */}
+        <PassportSection
+          numeral="I"
+          title="Ledger summary"
+          subtitle="Computed from logged exchanges and recorded spending."
+        >
           <DcaSummary
             purchases={purchases}
             homeCurrency={trip.home_currency}
             targetCurrency={trip.target_currency}
             totalExpensesForeign={totalExpensesForeign}
           />
+        </PassportSection>
 
-          {/* Expense calculator */}
-          <div className="mt-4">
-            <ExpenseCalculator
-              trueRate={stats.trueRate}
-              homeCurrency={trip.home_currency}
+        {/* § II — Cost Lookup */}
+        <PassportSection
+          numeral="II"
+          title="Cost lookup"
+          subtitle="Enter a foreign-currency price to see its true home-currency cost."
+        >
+          <ExpenseCalculator
+            trueRate={stats.trueRate}
+            homeCurrency={trip.home_currency}
+            targetCurrency={trip.target_currency}
+            onLogExchange={() => setModalOpen(true)}
+          />
+        </PassportSection>
+
+        {/* § III — Cash Exchanges */}
+        <PassportSection
+          numeral="III"
+          title="Cash exchanges"
+          subtitle={`Logged purchases of foreign currency. ${
+            purchases.length > 0 ? `(${purchases.length})` : ""
+          }`}
+        >
+          <PurchaseList
+            purchases={purchases}
+            homeCurrency={trip.home_currency}
+            targetCurrency={trip.target_currency}
+            onDelete={handleDeletePurchase}
+          />
+        </PassportSection>
+
+        {/* § IV — Recorded Spending */}
+        <PassportSection
+          numeral="IV"
+          title="Recorded spending"
+          subtitle="What you've spent at your destination."
+          action={
+            !isGuest ? (
+              <button
+                onClick={() => setExpenseModalOpen(true)}
+                className="btn-doc btn-doc-sm"
+              >
+                + Record spending
+              </button>
+            ) : undefined
+          }
+        >
+          <ExpenseLedger
+            expenses={expenses}
+            loading={expensesLoading}
+            trueRate={stats.trueRate}
+            homeCurrency={trip.home_currency}
+            targetCurrency={trip.target_currency}
+            isGuest={isGuest}
+            onDelete={handleDeleteExpense}
+          />
+        </PassportSection>
+
+        {/* § V — Analytics */}
+        {!isGuest && expenses.length > 0 && (
+          <PassportSection
+            numeral="V"
+            title="Analytics"
+            subtitle="Spending breakdown by category."
+          >
+            {/*
+              Pie chart commented out — replaced with horizontal bar chart.
+              <SpendingPieChart
+                expenses={expenses}
+                targetCurrency={trip.target_currency}
+              />
+            */}
+            <SpendingBars
+              expenses={expenses}
               targetCurrency={trip.target_currency}
-              onLogExchange={() => setModalOpen(true)}
             />
-          </div>
+          </PassportSection>
+        )}
 
-          {/* ── Tab bar ─────────────────────────────────────────────── */}
-          <div className="mt-8 rounded-xl bg-[#f1f5f9] p-1 dark:bg-foreground/5">
-            <div className="flex">
-              <button
-                onClick={() => setActiveTab("activity")}
-                className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all ${
-                  activeTab === "activity"
-                    ? "bg-card text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:shadow-none"
-                    : "text-muted hover:text-foreground/70"
-                }`}
-              >
-                Activity
-              </button>
-              <button
-                onClick={() => setActiveTab("analytics")}
-                className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all ${
-                  activeTab === "analytics"
-                    ? "bg-card text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:shadow-none"
-                    : "text-muted hover:text-foreground/70"
-                }`}
-              >
-                Analytics
-              </button>
-            </div>
-          </div>
-
-          {/* ── Tab content ─────────────────────────────────────────── */}
-          <div className="mt-6">
-            {activeTab === "activity" ? (
-              <>
-                <div>
-                  <h2 className="mb-4 text-sm font-medium text-muted">
-                    Purchase History
-                    {purchases.length > 0 && (
-                      <span className="ml-2 text-foreground/40">
-                        ({purchases.length})
-                      </span>
-                    )}
-                  </h2>
-                  <PurchaseList
-                    purchases={purchases}
-                    homeCurrency={trip.home_currency}
-                    targetCurrency={trip.target_currency}
-                    onDelete={handleDeletePurchase}
-                  />
-                </div>
-
-                <div className="mt-12">
-                  <ExpenseLedger
-                    expenses={expenses}
-                    loading={expensesLoading}
-                    tripId={trip.id}
-                    trueRate={stats.trueRate}
-                    homeCurrency={trip.home_currency}
-                    targetCurrency={trip.target_currency}
-                    isGuest={isGuest}
-                    onCreated={(expense) =>
-                      setExpenses((prev) => [expense, ...prev])
-                    }
-                    onDelete={handleDeleteExpense}
-                  />
-                </div>
-              </>
-            ) : (
-              <>
-                {!isGuest && expenses.length > 0 ? (
-                  <SpendingPieChart
-                    expenses={expenses}
-                    targetCurrency={trip.target_currency}
-                  />
-                ) : (
-                  <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-16 text-center">
-                    <p className="text-sm font-medium text-foreground/70">
-                      No spending data yet
-                    </p>
-                    <p className="mt-1 text-sm text-muted">
-                      {isGuest
-                        ? "Sign up and log expenses to see your spending breakdown."
-                        : "Record spending on the Activity tab to see your breakdown."}
-                    </p>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        </div>
+        {/* Footer */}
+        <footer className="mt-16 pt-3.5 border-t border-border flex justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-muted">
+          <span>Document valid · this device</span>
+          <span className="hidden sm:inline">
+            No tracking · No transmission
+          </span>
+          <span>End of record</span>
+        </footer>
       </div>
 
       <AddPurchaseModal
@@ -308,6 +288,58 @@ export default function TripDetailPage() {
         homeCurrency={trip.home_currency}
         targetCurrency={trip.target_currency}
       />
+
+      <AddExpenseModal
+        open={expenseModalOpen}
+        onClose={() => setExpenseModalOpen(false)}
+        onCreated={(expense) => {
+          setExpenses((prev) => [expense, ...prev]);
+          setExpenseModalOpen(false);
+        }}
+        tripId={trip.id}
+        targetCurrency={trip.target_currency}
+      />
     </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// PassportSection — § I, § II, § III header block
+// ─────────────────────────────────────────────────────────────────────────
+
+function PassportSection({
+  numeral,
+  title,
+  subtitle,
+  action,
+  children,
+}: {
+  numeral: string;
+  title: string;
+  subtitle?: string;
+  action?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="mt-11">
+      <div className="flex items-baseline gap-3.5 mb-1">
+        <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-stamp">
+          Section {numeral}
+        </span>
+        <span className="flex-1 h-px bg-border" />
+      </div>
+      <div className="flex justify-between items-end gap-6 mb-5">
+        <div>
+          <h2 className="font-serif text-2xl sm:text-3xl text-accent tracking-tight mt-2 mb-1">
+            {title}
+          </h2>
+          {subtitle && (
+            <p className="font-serif italic text-muted text-sm">{subtitle}</p>
+          )}
+        </div>
+        {action}
+      </div>
+      {children}
+    </section>
   );
 }

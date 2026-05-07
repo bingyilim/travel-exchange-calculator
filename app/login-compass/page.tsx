@@ -11,7 +11,7 @@ import { useState } from "react";
 
 type Mode = "login" | "signup";
 
-export default function LoginPage() {
+export default function LoginCompassPage() {
   const router = useRouter();
   const supabase = createClient();
 
@@ -119,7 +119,7 @@ export default function LoginPage() {
 
             <form onSubmit={handleSubmit} className="mt-8 space-y-5">
               <UnderlineField
-                id="login-email"
+                id="compass-email"
                 label="Email"
                 type="email"
                 value={email}
@@ -128,7 +128,7 @@ export default function LoginPage() {
                 required
               />
               <UnderlineField
-                id="login-password"
+                id="compass-password"
                 label="Password"
                 type="password"
                 value={password}

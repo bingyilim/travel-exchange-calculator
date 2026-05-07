@@ -2,28 +2,49 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ──────────────────────────────────────────────────────────────────────────
+   Travel Exchange — Stamped Passport Theme
+   Document-style palette: cream paper + navy ink + maroon stamps
+   Token names retained so existing utility classes keep working.
+   ────────────────────────────────────────────────────────────────────────── */
+
 :root {
-  --background: #f9fafb;
-  --foreground: #0f172a;
-  --card: #ffffff;
-  --card-hover: #f1f5f9;
-  --border: #cbd5e1;
-  --muted: #475569;
-  --accent: #1e293b;
-  --accent-glow: #1e293b20;
-  --destructive: #b91c1c;
+  /* Light: cream document paper, navy ink, maroon stamp */
+  --background: #f4f1ea;        /* cream paper */
+  --foreground: #1f1d1b;        /* warm black ink */
+  --card: #fbf8f1;              /* lighter inner paper */
+  --card-hover: #efe9da;        /* warmer hover */
+  --border: #1f1d1b30;          /* hairline rule */
+  --border-strong: #1f1d1b;     /* strong document rule */
+  --muted: #5a5448;             /* soft ink */
+  --muted-faint: #8b8470;       /* faint ink (registration marks) */
+  --accent: #1c2c4c;            /* navy — primary action ink */
+  --accent-glow: #1c2c4c14;     /* navy at 8% — for shadows/halos */
+  --stamp: #8a2018;             /* maroon — section labels, alerts */
+  --stamp-blue: #0e3b66;        /* document blue — used for stamps */
+  --destructive: #8a2018;       /* maroon, matches stamps */
+  --btn-bg: #1c2c4c;
+  --btn-fg: #f4f1ea;
+  --btn-bg-hover: #14213d;
 }
 
 .dark {
-  --background: #09090b;
-  --foreground: #fafafa;
-  --card: #18181b;
-  --card-hover: #27272a;
-  --border: #27272a;
-  --muted: #a1a1aa;
-  --accent: #3b82f6;
-  --accent-glow: #3b82f620;
-  --destructive: #ef4444;
+  --background: #1a1815;
+  --foreground: #e8dec8;
+  --card: #221f1b;
+  --card-hover: #2a2622;
+  --border: #e8dec820;
+  --border-strong: #6b6357;
+  --muted: #9a9282;
+  --muted-faint: #5e574b;
+  --accent: #c4b896;
+  --accent-glow: #c4b89614;
+  --stamp: #c8775c;
+  --stamp-blue: #8b9eb0;
+  --destructive: #c8775c;
+  --btn-bg: transparent;
+  --btn-fg: #e8dec8;
+  --btn-bg-hover: #e8dec80c;
 }
 
 @theme inline {
@@ -32,13 +53,20 @@
   --color-card: var(--card);
   --color-card-hover: var(--card-hover);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-muted: var(--muted);
+  --color-muted-faint: var(--muted-faint);
   --color-accent: var(--accent);
   --color-accent-glow: var(--accent-glow);
+  --color-stamp: var(--stamp);
+  --color-stamp-blue: var(--stamp-blue);
   --color-destructive: var(--destructive);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-serif: var(--font-serif);
+  --color-btn-bg: var(--btn-bg);
+  --color-btn-fg: var(--btn-fg);
+  --color-btn-bg-hover: var(--btn-bg-hover);
+  --font-sans: var(--font-newsreader);
+  --font-serif: var(--font-dm-serif);
+  --font-mono: var(--font-jetbrains-mono);
 }
 
 body {
@@ -47,59 +75,104 @@ body {
   overflow-x: hidden;
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-newsreader), Georgia, "Times New Roman", serif;
+  /* Subtle paper grain — extremely faint multiply layer */
+  background-image:
+    radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(0, 0, 0, 0.03) 100%),
+    radial-gradient(circle at 30% 20%, rgba(0, 0, 0, 0.02) 0, transparent 50%);
 }
 
-/* Themed scrollbar */
+.dark body {
+  background-image:
+    radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(255, 255, 255, 0.02) 100%),
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.015) 0, transparent 50%);
+}
+
+/* ── Themed scrollbar — document gutter ──────────────────────────────── */
 .scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
+  scrollbar-color: var(--border-strong) transparent;
 }
 .scrollbar-thin::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 .scrollbar-thin::-webkit-scrollbar-track {
   background: transparent;
+  border-left: 1px solid var(--border);
 }
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
+  background: var(--border-strong);
+  border-radius: 0;
+  border: 2px solid var(--background);
 }
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: var(--muted);
+  background: var(--accent);
 }
 
-/* Button shine sweep */
-.btn-shine {
-  position: relative;
-  overflow: hidden;
-}
-.btn-shine::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    120deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.12) 50%,
-    transparent 70%
-  );
-  transform: translateX(-100%);
-  animation: shine 5s ease-in-out 2s infinite;
-}
-@keyframes shine {
-  0% {
-    transform: translateX(-100%);
-  }
-  12% {
-    transform: translateX(100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
+/* ── Document utility classes ────────────────────────────────────────── */
+.font-mono-tabular {
+  font-feature-settings: "tnum" 1, "lnum" 1;
 }
 
-/* Floating calculator pulse */
+.tracking-document {
+  letter-spacing: 0.18em;
+}
+.tracking-stamp {
+  letter-spacing: 0.22em;
+}
+
+/* Stamp box — used by Active / Closed labels */
+.stamp-box {
+  display: inline-block;
+  border: 1.5px solid currentColor;
+  padding: 4px 10px;
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  line-height: 1.3;
+  text-align: center;
+  opacity: 0.85;
+}
+
+/* Document button — filled in light, ghost outlined in dark */
+.btn-doc {
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  border: 1.5px solid var(--accent);
+  padding: 10px 18px;
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.btn-doc:hover {
+  background: var(--btn-bg-hover);
+}
+.dark .btn-doc {
+  border-color: var(--border-strong);
+  color: var(--foreground);
+}
+.dark .btn-doc:hover {
+  border-color: var(--foreground);
+  background: var(--btn-bg-hover);
+}
+
+.btn-doc-sm {
+  padding: 8px 14px;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+}
+
+/* ── Login page animations — kept from original ──────────────────────── */
 @keyframes float {
   0%,
   100% {
@@ -113,7 +186,6 @@ body {
   animation: float 4s ease-in-out infinite;
 }
 
-/* Aurora motion for login panel */
 @keyframes aurora {
   0%,
   100% {
@@ -124,7 +196,6 @@ body {
   }
 }
 
-/* Meteor streak */
 @keyframes meteor {
   0% {
     transform: translateX(0);
@@ -137,5 +208,70 @@ body {
   100% {
     transform: translateX(-500px);
     opacity: 0;
+  }
+}
+
+/* ── Login variation animations (compass sway, globe rotation, dot pulse, dash march) ── */
+@keyframes compass-sway {
+  0%,
+  100% {
+    transform: rotate(47deg);
+  }
+  50% {
+    transform: rotate(52deg);
+  }
+}
+.animate-compass-sway {
+  transform-origin: 50% 50%;
+  animation: compass-sway 6s ease-in-out infinite;
+}
+
+@keyframes globe-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-globe-spin {
+  animation: globe-spin 60s linear infinite;
+  transform-origin: 50% 50%;
+}
+
+@keyframes city-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    r: 3;
+  }
+  50% {
+    opacity: 1;
+    r: 5;
+  }
+}
+.animate-city-pulse {
+  animation: city-pulse 2.4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes dash-march {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -40;
+  }
+}
+.animate-dash-march {
+  animation: dash-march 6s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-compass-sway,
+  .animate-globe-spin,
+  .animate-city-pulse,
+  .animate-dash-march {
+    animation: none;
   }
 }

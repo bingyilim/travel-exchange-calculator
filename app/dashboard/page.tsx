@@ -29,98 +29,158 @@ export default function DashboardPage() {
     [storage],
   );
 
+  const activeTrips = trips.filter((t) => t.is_active);
+  const archivedTrips = trips.filter((t) => !t.is_active);
+  const today = new Date().toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+  });
+
   return (
-    <div className="min-h-dvh bg-background">
-      <div className="mx-auto max-w-5xl px-6">
-        {/* ── Header ──────────────────────────────────────────────── */}
-        <header className="sticky top-0 z-50 -mx-6 px-6 pt-4">
-          <div className="rounded-2xl border border-border/50 bg-card px-6 py-3.5 dark:bg-card/60 dark:backdrop-blur-md">
-            <div className="flex items-center justify-between">
-              <h1 className="text-sm font-semibold tracking-tight text-foreground">
-                Travel Exchange
-              </h1>
-              <div className="flex items-center gap-2">
-                <span className="hidden rounded-full bg-foreground/5 px-2.5 py-1 text-xs font-medium text-foreground/70 sm:inline-block">
-                  {isGuest ? "Guest" : userEmail}
-                </span>
-                <ThemeToggle />
-                <a
-                  href="/auth/signout"
-                  className="rounded-lg px-3 py-1.5 text-xs font-medium text-foreground/60 transition-colors hover:bg-foreground/5 hover:text-foreground"
-                >
-                  {isGuest ? "Exit Guest Mode" : "Sign Out"}
-                </a>
+    <div className="min-h-dvh bg-background text-foreground">
+      <div className="mx-auto max-w-[1100px] px-6 pb-20 sm:px-14">
+        {/* ── Document Header ────────────────────────────────────── */}
+        <header className="border-b-2 border-[color:var(--border-strong)] pt-8 pb-5">
+          <div className="flex items-end justify-between gap-8">
+            <h1
+              className="m-0 font-serif text-[38px] leading-none text-[color:var(--accent)]"
+              style={{ letterSpacing: "-0.01em" }}
+            >
+              Travel Exchange
+            </h1>
+            <div className="flex items-end gap-6">
+              <div
+                className="hidden text-right font-mono text-[11px] leading-relaxed text-muted sm:block"
+                style={{ letterSpacing: "0.04em" }}
+              >
+                HOLDER ·{" "}
+                {(isGuest ? "Guest" : (userEmail ?? "")).toUpperCase()}
               </div>
+              <ThemeToggle />
+              <a
+                href="/auth/signout"
+                className="font-mono text-[10px] uppercase text-muted transition-colors hover:text-foreground"
+                style={{ letterSpacing: "0.18em" }}
+              >
+                {isGuest ? "Exit" : "Sign out"}
+              </a>
             </div>
+          </div>
+
+          {/* Registration line: doc № and issue date — feels like a form */}
+          <div
+            className="mt-4 flex items-center gap-4 font-mono text-[10px] uppercase text-[color:var(--muted-faint)]"
+            style={{ letterSpacing: "0.22em" }}
+          >
+            <span>Doc № TX-2026</span>
+            <span className="h-px flex-1 bg-[color:var(--border)]" />
+            <span>{today}</span>
           </div>
         </header>
 
-        {/* ── Content ─────────────────────────────────────────────── */}
-        <div className="pt-12">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-sm font-medium text-muted">Your Trips</h2>
-            <button
-              onClick={() => setModalOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-3.5 py-2 text-sm font-semibold text-white shadow-md shadow-accent-glow transition-all hover:shadow-lg hover:shadow-accent-glow"
+        {loading ? (
+          <div className="flex justify-center py-24">
+            <svg
+              className="h-5 w-5 animate-spin text-muted"
+              viewBox="0 0 24 24"
+              fill="none"
             >
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
                 stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 4.5v15m7.5-7.5h-15"
-                />
-              </svg>
-              New Trip
-            </button>
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+              />
+            </svg>
           </div>
-
-          {loading ? (
-            <div className="flex justify-center py-16">
-              <svg
-                className="h-5 w-5 animate-spin text-muted"
-                viewBox="0 0 24 24"
-                fill="none"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                />
-              </svg>
-            </div>
-          ) : (
-            <TripList trips={trips} onDelete={handleDelete} />
-          )}
-
-          {isGuest && (
-            <div className="mt-16 rounded-lg border border-border/60 bg-card px-5 py-4 shadow-sm dark:shadow-none">
-              <p className="text-sm text-muted">
-                Your data is stored locally on this device.{" "}
-                <a
-                  href="/login"
-                  className="font-medium text-accent hover:underline"
+        ) : (
+          <>
+            {/* ── Section I — In progress ─────────────────────────── */}
+            <Section
+              numeral="I"
+              title="In progress"
+              subtitle={
+                activeTrips.length === 0
+                  ? "No open trips. Begin recording a new journey below."
+                  : activeTrips.length === 1
+                    ? "One trip is open at the time of issue."
+                    : "Multiple trips are open. Most recent first."
+              }
+              action={
+                <button
+                  onClick={() => setModalOpen(true)}
+                  className="btn-doc self-start sm:self-auto"
                 >
-                  Create an account
-                </a>{" "}
-                to sync across devices.
-              </p>
+                  + Issue trip
+                </button>
+              }
+            >
+              <TripList
+                trips={activeTrips}
+                onDelete={handleDelete}
+                variant="active"
+                onCreate={() => setModalOpen(true)}
+              />
+            </Section>
+
+            {/* ── Section II — Past entries ───────────────────────── */}
+            {archivedTrips.length > 0 && (
+              <Section
+                numeral="II"
+                title="Past entries"
+                subtitle={`${archivedTrips.length} closed trip${
+                  archivedTrips.length === 1 ? "" : "s"
+                } on record.`}
+              >
+                <TripList
+                  trips={archivedTrips}
+                  onDelete={handleDelete}
+                  variant="archive"
+                />
+              </Section>
+            )}
+          </>
+        )}
+
+        {/* ── Guest banner ─────────────────────────────────────────── */}
+        {isGuest && !loading && (
+          <div className="mt-16 border border-dashed border-[color:var(--border-strong)] bg-[color:var(--accent-glow)] px-7 py-5">
+            <div
+              className="mb-2 font-mono text-[10px] uppercase text-[color:var(--stamp)]"
+              style={{ letterSpacing: "0.22em" }}
+            >
+              ✦ Notice
             </div>
-          )}
-        </div>
+            <p className="m-0 text-[14px] italic text-muted">
+              Your data is stored locally on this device.{" "}
+              <a
+                href="/login"
+                className="text-[color:var(--accent)] underline decoration-[color:var(--border-strong)] underline-offset-4 hover:decoration-[color:var(--accent)]"
+              >
+                Create an account
+              </a>{" "}
+              to sync across devices.
+            </p>
+          </div>
+        )}
+
+        {/* ── Document Footer ──────────────────────────────────────── */}
+        <footer
+          className="mt-16 flex items-center justify-between border-t border-[color:var(--border)] pt-4 font-mono text-[10px] uppercase text-[color:var(--muted-faint)]"
+          style={{ letterSpacing: "0.2em" }}
+        >
+          <span>Document valid · this device</span>
+          <span className="hidden sm:inline">No tracking · No transmission</span>
+          <span>End of record</span>
+        </footer>
       </div>
 
       <CreateTripModal
@@ -132,5 +192,50 @@ export default function DashboardPage() {
         }}
       />
     </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Section — § I, § II header block
+// ─────────────────────────────────────────────────────────────────────────
+
+function Section({
+  numeral,
+  title,
+  subtitle,
+  action,
+  children,
+}: {
+  numeral: string;
+  title: string;
+  subtitle: string;
+  action?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="mt-11">
+      <div className="mb-1 flex items-baseline gap-3.5">
+        <span
+          className="font-mono text-[11px] font-semibold uppercase text-[color:var(--stamp)]"
+          style={{ letterSpacing: "0.22em" }}
+        >
+          Section {numeral}
+        </span>
+        <span className="h-px flex-1 bg-[color:var(--border)]" />
+      </div>
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
+        <div>
+          <h2
+            className="m-0 mt-2 font-serif text-[30px] leading-tight text-[color:var(--accent)]"
+            style={{ letterSpacing: "-0.01em" }}
+          >
+            {title}
+          </h2>
+          <p className="m-0 text-[14px] italic text-muted">{subtitle}</p>
+        </div>
+        {action}
+      </div>
+      {children}
+    </section>
   );
 }

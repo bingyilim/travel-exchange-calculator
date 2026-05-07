@@ -11,7 +11,7 @@ import { useState } from "react";
 
 type Mode = "login" | "signup";
 
-export default function LoginPage() {
+export default function LoginEarthPage() {
   const router = useRouter();
   const supabase = createClient();
 
@@ -92,34 +92,59 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-dvh bg-background">
-      <div className="fixed right-4 top-4 z-10">
+      <div className="fixed right-4 top-4 z-20">
         <ThemeToggle />
       </div>
 
-      <div className="mx-auto flex min-h-dvh max-w-6xl items-center justify-center px-6 py-16 md:px-12">
-        <div className="grid w-full grid-cols-1 items-center gap-12 md:grid-cols-2 md:gap-16">
-          {/* ── LEFT: Compass ─────────────────────────────────────────── */}
-          <div className="flex justify-center md:justify-end">
-            <CompassDial />
+      <div className="grid min-h-dvh grid-cols-1 md:grid-cols-[1.2fr_1fr]">
+        {/* ── LEFT: Globe ─────────────────────────────────────────── */}
+        <section className="relative flex items-center justify-center px-6 py-10 md:py-14">
+          {/* Overlay */}
+          <div className="absolute left-6 top-6 md:left-10 md:top-10 z-10">
+            <p
+              className="font-mono uppercase text-muted whitespace-nowrap"
+              style={{ fontSize: 10, letterSpacing: "0.22em" }}
+            >
+              Live network
+            </p>
+            <p
+              className="mt-1 font-serif italic text-foreground whitespace-nowrap"
+              style={{ fontSize: 20 }}
+            >
+              USD to JPY · MYR to KRW
+            </p>
+            <p
+              className="mt-1 font-mono uppercase text-muted whitespace-nowrap"
+              style={{ fontSize: 10, letterSpacing: "0.22em" }}
+            >
+              24 currencies · 8 cities
+            </p>
           </div>
 
-          {/* ── RIGHT: Form ───────────────────────────────────────────── */}
-          <div className="w-full max-w-[380px] mx-auto md:mx-0">
+          <Globe />
+        </section>
+
+        {/* ── RIGHT: Form ─────────────────────────────────────────── */}
+        <section className="flex items-center justify-center bg-card border-t-[1.5px] md:border-t-0 md:border-l-[1.5px] border-foreground px-8 py-10 md:px-14 md:py-14">
+          <div className="w-full max-w-[380px]">
             <div className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-stamp mb-4">
-              {isLogin ? "Re-entry" : "New entry"}
+              {isLogin ? "Re-entry" : "New traveller"}
             </div>
-            <h1 className="font-serif italic text-4xl sm:text-5xl text-accent leading-[1.05] tracking-tight">
-              {isLogin ? "Welcome back." : "Chart a new course."}
+            <h1
+              className="font-serif italic text-accent leading-[1.05] tracking-tight"
+              style={{ fontSize: 44 }}
+            >
+              {isLogin ? "Welcome back." : "Join the network."}
             </h1>
             <p className="mt-3 font-serif italic text-sm text-muted">
               {isLogin
-                ? "Sign in to resume your trips and exchange ledger."
-                : "Open a fresh ledger and plot your first bearing."}
+                ? "Sign in and pick up wherever you left off."
+                : "Open a ledger and chart your routes."}
             </p>
 
             <form onSubmit={handleSubmit} className="mt-8 space-y-5">
               <UnderlineField
-                id="login-email"
+                id="earth-email"
                 label="Email"
                 type="email"
                 value={email}
@@ -128,7 +153,7 @@ export default function LoginPage() {
                 required
               />
               <UnderlineField
-                id="login-password"
+                id="earth-password"
                 label="Password"
                 type="password"
                 value={password}
@@ -165,7 +190,7 @@ export default function LoginPage() {
                     : "Creating…"
                   : isLogin
                     ? "Sign in →"
-                    : "Open ledger →"}
+                    : "Create account →"}
               </button>
 
               <button
@@ -178,143 +203,129 @@ export default function LoginPage() {
             </form>
 
             <p className="mt-6 font-serif italic text-xs text-muted">
-              {isLogin ? "First time here?" : "Already have a ledger?"}
+              {isLogin ? "First time here? " : "Already have a ledger? "}
               <button
                 type="button"
                 onClick={() => switchMode(isLogin ? "signup" : "login")}
-                className="ml-2 not-italic font-mono text-[10px] uppercase tracking-[0.18em] text-stamp border-b border-dashed border-stamp hover:text-foreground hover:border-foreground transition-colors"
+                className="not-italic font-mono text-[10px] uppercase tracking-[0.18em] text-stamp border-b border-dashed border-stamp hover:text-foreground hover:border-foreground transition-colors"
               >
                 {isLogin ? "Open a ledger" : "Sign in"}
               </button>
             </p>
           </div>
-        </div>
+        </section>
       </div>
     </main>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// CompassDial — pure CSS/SVG dial with a swaying needle
+// Globe — wireframe + currency arcs (pure SVG)
 // ─────────────────────────────────────────────────────────────────────────
 
-function CompassDial() {
-  // 24 ticks at 15° apart
-  const ticks = Array.from({ length: 24 }, (_, i) => i * 15);
+const LONGITUDES = [0, 30, 60, 90, 120, 150];
+const LATITUDES = [-60, -30, 0, 30, 60];
 
+const ARCS = [
+  "M -65 -45 Q 0 -120 75 -25",
+  "M -75 30 Q -10 -100 80 35",
+  "M -45 60 Q 30 -10 70 -55",
+  "M -20 -75 Q 60 0 30 70",
+];
+
+const CITIES: Array<[number, number]> = [
+  [-65, -45],
+  [75, -25],
+  [-75, 30],
+  [80, 35],
+  [-45, 60],
+  [70, -55],
+  [-20, -75],
+  [30, 70],
+];
+
+function Globe() {
   return (
-    <div className="flex flex-col items-center">
-      <div
-        className="relative aspect-square w-[200px] sm:w-[420px] md:w-[460px]"
-        aria-hidden
-      >
-        {/* Outer dial */}
-        <div className="absolute inset-0 rounded-full border-[1.5px] border-foreground bg-card" />
-        {/* Inner solid hairline */}
-        <div className="absolute inset-[10%] rounded-full border border-foreground/30" />
-        {/* Inner dashed hairline */}
-        <div
-          className="absolute inset-[20%] rounded-full"
-          style={{
-            border: "1px dashed var(--foreground)",
-            opacity: 0.25,
-          }}
-        />
-
-        {/* 24 tick marks */}
-        {ticks.map((deg) => (
-          <div
-            key={deg}
-            className="absolute left-1/2 top-1/2"
-            style={{
-              transform: `translate(-50%, -50%) rotate(${deg}deg)`,
-              width: 1,
-              height: "100%",
-            }}
-          >
-            <div
-              className="absolute left-1/2 -translate-x-1/2 bg-foreground"
-              style={{ top: 6, width: 1, height: 8 }}
-            />
-          </div>
-        ))}
-
-        {/* Cardinal letters */}
-        <CardinalLetter letter="N" position="top-3 left-1/2 -translate-x-1/2" />
-        <CardinalLetter
-          letter="E"
-          position="right-3 top-1/2 -translate-y-1/2"
-        />
-        <CardinalLetter
-          letter="S"
-          position="bottom-3 left-1/2 -translate-x-1/2"
-        />
-        <CardinalLetter letter="W" position="left-3 top-1/2 -translate-y-1/2" />
-
-        {/* Needle (animates 47° → 52°) */}
-        <div className="absolute inset-0 animate-compass-sway">
-          {/* Top half — stamp red tip */}
-          <div
-            className="absolute left-1/2 top-1/2"
-            style={{
-              width: 4,
-              height: "35%",
-              transform: "translate(-50%, -100%)",
-              background: "var(--stamp)",
-              clipPath: "polygon(50% 0, 100% 100%, 0 100%)",
-            }}
-          />
-          {/* Bottom half — navy tail */}
-          <div
-            className="absolute left-1/2 top-1/2"
-            style={{
-              width: 4,
-              height: "35%",
-              transform: "translate(-50%, 0)",
-              background: "var(--accent)",
-              clipPath: "polygon(0 0, 100% 0, 50% 100%)",
-            }}
-          />
-        </div>
-
-        {/* Pivot */}
-        <div
-          className="absolute left-1/2 top-1/2 rounded-full bg-background"
-          style={{
-            width: 16,
-            height: 16,
-            transform: "translate(-50%, -50%)",
-            border: "2px solid var(--foreground)",
-          }}
-        />
-      </div>
-
-      {/* Readout — 64px below the dial */}
-      <div className="mt-16 text-center">
-        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-stamp">
-          Bearing 047°
-        </p>
-        <p className="mt-1.5 font-serif italic text-sm text-muted">
-          USD to JPY
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function CardinalLetter({
-  letter,
-  position,
-}: {
-  letter: string;
-  position: string;
-}) {
-  return (
-    <span
-      className={`absolute ${position} font-serif italic text-[24px] text-foreground leading-none select-none`}
+    <div
+      className="relative aspect-square w-[200px] sm:w-[420px] md:w-[500px]"
+      aria-hidden
     >
-      {letter}
-    </span>
+      {/* Bottom: rotating wireframe */}
+      <svg
+        viewBox="-110 -110 220 220"
+        className="absolute inset-0 w-full h-full text-foreground animate-globe-spin"
+      >
+        <g
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={0.6}
+          opacity={0.85}
+        >
+          {/* Outer */}
+          <circle cx={0} cy={0} r={100} strokeWidth={1} />
+
+          {/* Longitudes */}
+          {LONGITUDES.map((angle) => {
+            const rx = Math.abs(Math.cos((angle * Math.PI) / 180)) * 100;
+            return (
+              <ellipse
+                key={`lon-${angle}`}
+                cx={0}
+                cy={0}
+                rx={rx}
+                ry={100}
+              />
+            );
+          })}
+
+          {/* Latitudes */}
+          {LATITUDES.map((lat) => {
+            const cy = Math.sin((lat * Math.PI) / 180) * 100;
+            const rx = Math.cos((lat * Math.PI) / 180) * 100;
+            return (
+              <ellipse
+                key={`lat-${lat}`}
+                cx={0}
+                cy={cy}
+                rx={rx}
+                ry={6}
+                opacity={0.5}
+              />
+            );
+          })}
+        </g>
+      </svg>
+
+      {/* Top: arcs + city dots (no rotation) */}
+      <svg
+        viewBox="-110 -110 220 220"
+        className="absolute inset-0 w-full h-full"
+      >
+        <g stroke="var(--stamp)" fill="none" opacity={0.6}>
+          {ARCS.map((d, i) => (
+            <path
+              key={`arc-${i}`}
+              d={d}
+              strokeWidth={1.2}
+              strokeDasharray="4 6"
+              className="animate-dash-march"
+            />
+          ))}
+        </g>
+        <g fill="var(--stamp)">
+          {CITIES.map(([cx, cy], i) => (
+            <circle
+              key={`city-${i}`}
+              cx={cx}
+              cy={cy}
+              r={3.5}
+              className="animate-city-pulse"
+              style={{ animationDelay: `${(i % 4) * 0.6}s` }}
+            />
+          ))}
+        </g>
+      </svg>
+    </div>
   );
 }
 

@@ -1,27 +1,34 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { Playfair_Display } from "next/font/google";
+import { DM_Serif_Display, Newsreader, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// ──────────────────────────────────────────────────────────────────────────
+// Type system: serif display for headlines, serif body for editorial feel,
+// mono for currency codes, dates, and numeric data (the "document" look).
+// ──────────────────────────────────────────────────────────────────────────
+
+const dmSerif = DM_Serif_Display({
+  variable: "--font-dm-serif",
   subsets: ["latin"],
+  weight: ["400"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const newsreader = Newsreader({
+  variable: "--font-newsreader",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
 });
 
-const playfair = Playfair_Display({
-  variable: "--font-serif",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
-  weight: ["700"],
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
-  title: "Travel Exchange Calculator",
+  title: "Travel Exchange",
   description: "Track your DCA currency purchases for travel",
 };
 
@@ -33,7 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased`}
+        className={`${dmSerif.variable} ${newsreader.variable} ${jetbrainsMono.variable} antialiased`}
       >
         <ThemeProvider>{children}</ThemeProvider>
       </body>

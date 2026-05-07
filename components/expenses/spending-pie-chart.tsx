@@ -97,15 +97,14 @@ export function SpendingPieChart({ expenses, targetCurrency }: Props) {
   if (data.length === 0) return null;
 
   return (
-    <div className="rounded-xl border border-border/50 bg-card px-5 py-5">
-      <div className="flex items-baseline justify-between">
-        <h3 className="text-sm font-medium text-muted">Spending Breakdown</h3>
-        {!hasInteracted && (
-          <p className="text-xs text-muted/50">Tap a slice for details</p>
-        )}
-      </div>
+    <div className="border border-foreground/80 bg-card px-5 py-5">
+      {!hasInteracted && (
+        <p className="mb-2 text-right font-mono text-[10px] uppercase tracking-[0.18em] text-muted/70">
+          Tap a slice for details
+        </p>
+      )}
 
-      <div className="mt-4 flex flex-col items-center gap-6 sm:flex-row">
+      <div className="flex flex-col items-center gap-6 sm:flex-row">
         {/* Chart */}
         <div
           className="h-52 w-52 shrink-0 [&_*]:outline-none"
